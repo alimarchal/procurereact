@@ -6,23 +6,24 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCompanyRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255',
+            'name_arabic' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'cr_number' => 'nullable|string|max:50',
+            'vat_number' => 'nullable|string|max:50',
+            'company_type' => 'required|in:customer,vendor',
+            'language' => 'required|in:english,arabic',
+            'vat_percentage' => 'required|numeric|between:0,100',
+            'company_logo' => 'nullable|image|max:5120',
+            'company_stamp' => 'nullable|image|max:5120'
         ];
     }
 }
