@@ -20,6 +20,5 @@ Route::prefix('v1')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::apiResource('companies', CompanyController::class);
         Route::apiResource('customers', CustomerController::class);
-
     });
 });
