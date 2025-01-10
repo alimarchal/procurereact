@@ -85,13 +85,13 @@ class Company extends Model
         return $this->hasMany(Invoice::class);
     }
 
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
-    }
-
     public function getFullAddressAttribute()
     {
         return "{$this->address}, {$this->city}, {$this->country}";
+    }
+
+    public function company()
+    {
+        return $this->belongsToMany(Company::class);
     }
 }
