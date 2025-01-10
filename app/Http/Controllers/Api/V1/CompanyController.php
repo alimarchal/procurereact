@@ -13,9 +13,19 @@ use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index()
     {
-        $companies = Company::paginate();
+        $companies = Company::query()
+            ->when(request('search'), function($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->when(request('type'), function($query, $type) {
+                $query->where('company_type', $type);
+            })
+            ->latest()
+            ->paginate(request('per_page', 15));
+
         return CompanyResource::collection($companies);
     }
 
@@ -44,13 +54,14 @@ class CompanyController extends Controller
 
     public function show(Company $company): CompanyResource
     {
+        $this->authorize('view', $company);
         return new CompanyResource($company);
     }
 
     public function update(UpdateCompanyRequest $request, Company $company): JsonResponse
     {
+        $this->authorize('update', $company);
         $validatedData = $request->validated();
-        $validatedData['user_id'] = auth()->id();
 
         if ($request->hasFile('company_logo')) {
             if ($company->company_logo) {
@@ -78,16 +89,23 @@ class CompanyController extends Controller
 
     public function destroy(Company $company): JsonResponse
     {
+        $this->authorize('delete', $company);
+
         if ($company->quotations()->exists() || $company->invoices()->exists()) {
             return response()->json([
                 'message' => 'Cannot delete company with associated records'
             ], 422);
         }
 
+        if ($company->company_logo) {
+            Storage::disk('public')->delete($company->company_logo);
+        }
+        if ($company->company_stamp) {
+            Storage::disk('public')->delete($company->company_stamp);
+        }
+
         $company->delete();
 
-        return response()->json([
-            'message' => 'Company deleted successfully'
-        ]);
+        return response()->json(['message' => 'Company deleted successfully']);
     }
 }

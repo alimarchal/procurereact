@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\CompanyController;
 use App\Http\Controllers\Api\V1\CustomerController;
 use App\Http\Controllers\Api\V1\ItemController;
+use App\Http\Controllers\Api\V1\ProjectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
@@ -22,6 +23,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::apiResource('companies', CompanyController::class);
         Route::apiResource('customers', CustomerController::class);
+        Route::apiResource('projects', ProjectController::class);
         Route::apiResource('categories', CategoryController::class);
         Route::apiResource('items', ItemController::class);
 
