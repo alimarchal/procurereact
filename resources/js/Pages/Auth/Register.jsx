@@ -9,7 +9,7 @@ export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
         email: "",
-        refNo: "",
+        ibr_no: "",
         password: "",
         password_confirmation: "",
     });
@@ -29,14 +29,14 @@ export default function Register() {
             <form onSubmit={submit} className="space-y-4">
                 <div>
                     <InputLabel
-                        htmlFor="refNo"
+                        htmlFor="ibr_no"
                         value="Reference No."
                         required={false}
                     />
                     <TextInput
-                        id="refNo"
-                        name="refNo"
-                        value={data.refNo}
+                        id="ibr_no"
+                        name="ibr_no"
+                        value={data.ibr_no}
                         placeholder="Enter Reference No, If any"
                         className="mt-1 block w-full"
                         autoComplete="off"

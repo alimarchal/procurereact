@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -34,13 +35,18 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'type' => 'nullable|string|in:Super Admin,Admin Support,Admin,Team Member,IBR'
         ]);
 
         $user = User::create([
             'name' => $request->name,
+            'ibr_no' => $request->ibr_no,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        $role = Role::findByName($request->type ?? 'Admin');
+        $user->assignRole($role);
 
         event(new Registered($user));
 
