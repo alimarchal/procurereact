@@ -18,6 +18,24 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+
+            $table->string('ibr_no')->nullable()->unique();
+            $table->string('referred_by')->nullable();
+            $table->enum('gender',['Male','Female','Other'])->nullable();
+            $table->string('country_of_business')->nullable();
+            $table->string('city_of_business')->nullable();
+            $table->string('country_of_bank')->nullable();
+            $table->string('bank')->nullable();
+            $table->string('iban')->nullable();
+            $table->string('currency')->nullable();
+            $table->string('mobile_number')->nullable();
+            $table->date('dob')->nullable();
+            $table->string('mac_address')->nullable();
+            $table->string('device_name')->nullable();
+            $table->enum('type',['Super Admin','Admin Support','Admin','Team Member','IBR'])->default('Admin');
+            $table->enum('is_active',['Yes','No'])->nullable();
+            $table->enum('is_super_admin',['Yes','No'])->default('No')->nullable();
+
             $table->timestamps();
         });
 
