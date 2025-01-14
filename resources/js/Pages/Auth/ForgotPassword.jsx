@@ -3,16 +3,47 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { validateForgotPassword } from "@/Components/Validation";
+import { useState } from "react";
+import InputLabel from "@/Components/InputLabel";
 
 export default function ForgotPassword({ status }) {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, reset } = useForm({
         email: "",
     });
 
+    const [errors, setErrors] = useState({});
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+
+        setData((prevFormData) => ({
+            ...prevFormData,
+            [name]: value,
+        }));
+
+        if (value) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                [name]: "",
+            }));
+        }
+    };
+
     const submit = (e) => {
         e.preventDefault();
+        const validationErrors = validateForgotPassword(data);
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
 
-        post(route("password.email"));
+        post(route("password.email"), {
+            onError: (serverErrors) => {
+                setErrors(serverErrors);
+            },
+            onFinish: () => reset("email"),
+        });
     };
 
     return (
@@ -32,16 +63,17 @@ export default function ForgotPassword({ status }) {
             )}
 
             <form onSubmit={submit}>
+                <InputLabel htmlFor="email" value="Email" required={true} />
                 <TextInput
                     id="email"
-                    type="email"
+                    type="text"
                     name="email"
                     value={data.email}
                     placeholder="Enter Email Address"
                     className="mt-1 block w-full"
-                    onChange={(e) => setData("email", e.target.value)}
+                    onChange={handleInputChange}
                 />
-                <InputError message={errors.email} className="mt-2" />
+                <InputError message={errors.email} />
 
                 <div className="mt-4 flex items-center justify-end">
                     <Link
