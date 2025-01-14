@@ -5,18 +5,47 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { validateLogin } from "@/Components/Validation";
+import { useState } from "react";
 
 export default function Login({ status, canResetPassword }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, reset } = useForm({
         email: "",
         password: "",
         remember: false,
     });
 
+    const [errors, setErrors] = useState({});
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+
+        setData((prevFormData) => ({
+            ...prevFormData,
+            [name]: value,
+        }));
+
+        if (value) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                [name]: "",
+            }));
+        }
+    };
+
     const submit = (e) => {
         e.preventDefault();
+        const validationErrors = validateLogin(data);
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
 
         post(route("login"), {
+            onError: (serverErrors) => {
+                setErrors(serverErrors);
+            },
             onFinish: () => reset("password"),
         });
     };
@@ -43,9 +72,9 @@ export default function Login({ status, canResetPassword }) {
                         className="mt-1 block w-full"
                         autoComplete="username"
                         isFocused={true}
-                        onChange={(e) => setData("email", e.target.value)}
+                        onChange={handleInputChange}
                     />
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email} />
                 </div>
 
                 <div className="mt-4">
@@ -62,9 +91,9 @@ export default function Login({ status, canResetPassword }) {
                         placeholder="Enter Passowrd"
                         className="mt-1 block w-full"
                         autoComplete="current-password"
-                        onChange={(e) => setData("password", e.target.value)}
+                        onChange={handleInputChange}
                     />
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password} />
                 </div>
 
                 <div className="mt-4 block">
