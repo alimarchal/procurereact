@@ -13,14 +13,15 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('ibr_no')->nullable()->unique();
+            $table->foreignId('referred_by')->nullable()
+                ->constrained('users', 'id')
+                ->onDelete('set null');
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-
-            $table->string('ibr_no')->nullable()->unique();
-            $table->string('referred_by')->nullable();
             $table->enum('gender',['Male','Female','Other'])->nullable();
             $table->string('country_of_business')->nullable();
             $table->string('city_of_business')->nullable();
@@ -35,7 +36,6 @@ return new class extends Migration
             $table->enum('type',['Super Admin','Admin Support','Admin','Team Member','IBR'])->default('Admin');
             $table->enum('is_active',['Yes','No'])->nullable();
             $table->enum('is_super_admin',['Yes','No'])->default('No')->nullable();
-
             $table->timestamps();
         });
 

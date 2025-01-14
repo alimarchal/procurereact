@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -22,11 +23,11 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'ibr_no',
+        'referred_by',
         'name',
         'email',
         'password',
-        'ibr_no',
-        'referred_by',
         'gender',
         'country_of_business',
         'city_of_business',
@@ -65,49 +66,100 @@ class User extends Authenticatable
         ];
     }
 
-    public function company()
-    {
-        return $this->hasOne(Company::class);
-    }
-
-
-    /* Relation for IBRs having child IBRs start */
+    /**
+     * Get IBRs (Independent Business Representatives) referred by this user
+     * Establishes a one-to-many relationship where:
+     * - referred_by links to parent IBR's ibr_no
+     * - Returns collection of child IBRs referred by current user
+     *
+     * @return HasMany
+     */
     public function ibr(): HasMany
     {
-        return $this->hasMany(User::class,'referred_by','ibr_no');
+        return $this->hasMany(User::class, 'referred_by', 'id')->with('ibr');
     }
 
-
+    /**
+     * Get all IBRs in the downline network recursively
+     * Establishes a recursive relationship that:
+     * - Returns direct referrals (level 1)
+     * - Eager loads nested referrals (level 2+) via 'ibr' relation
+     * - Enables multi-level marketing structure tracking
+     * - Useful for calculating indirect commissions & network size
+     *
+     * @return HasMany
+     */
     public function ibrReferred(): HasMany
     {
-        // This is method where we implement recursive relationship
-        return $this->hasMany(User::class,'referred_by', 'ibr_no')->with('ibr');
+        return $this->hasMany(User::class, 'referred_by', 'id');
     }
-    /* Relation for IBRs having child IBRs end */
 
 
-    /* Relation for IBRs having parent IBRs start */
+    /**
+     * Get immediate parent IBR (upline)
+     * Retrieves single-level parent relationship:
+     * - Returns IBR who directly referred current user
+     * - Selects only essential fields (id, ibr_no, referred_by)
+     * - Used for direct upline commission calculations
+     *
+     * @return HasMany
+     */
     public function parentIbr(): HasMany
     {
-        // This relationship will only return one level of parent ibr
-        return $this->hasMany(User::class,'ibr_no','referred_by')->select('id','ibr_no','referred_by');
+        return $this->hasMany(User::class, 'id', 'referred_by')->select('id','ibr_no','referred_by');
     }
 
+    /**
+     * Get entire upline network recursively
+     * Establishes recursive relationship that:
+     * - Returns immediate parent IBR
+     * - Eager loads all ancestor IBRs via 'parentIbr' relation
+     * - Enables upward network traversal
+     * - Used for multi-level commission structures
+     *
+     * @return HasMany
+     */
     public function parentIbrReference(): HasMany
     {
-        // This is method where we implement recursive relationship
-        return $this->hasMany(User::class,'ibr_no', 'referred_by')->with('parentIbr');
+        return $this->hasMany(User::class, 'id', 'referred_by')->with('parentIbr');
     }
-    /* Relation for IBRs having parent IBRs end */
 
+
+    public function referralNetwork()
+    {
+        return $this->ibrReferred()->with('referralNetwork');
+    }
+
+    /**
+     * Get user's business profile
+     * One-to-one relationship with Business model
+     *
+     * @return HasOne
+     */
+    public function business()
+    {
+        return $this->hasOne(Business::class);
+    }
+
+    /**
+     * Get direct commissions earned from level 1 referrals
+     * Tracks commissions from immediately referred IBRs
+     *
+     * @return HasMany
+     */
     public function directCommissions(): HasMany
     {
         return $this->hasMany(IbrDirectCommission::class);
     }
 
+    /**
+     * Get indirect commissions earned from downline network
+     * Tracks commissions from level 2+ referrals in network
+     *
+     * @return HasMany
+     */
     public function indirectCommissions(): HasMany
     {
         return $this->hasMany(IbrIndirectCommission::class);
     }
-
 }

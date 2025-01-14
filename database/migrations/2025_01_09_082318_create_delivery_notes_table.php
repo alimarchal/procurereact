@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('delivery_number')->unique();
             $table->foreignId('quotation_id')->nullable()->constrained();
-            $table->foreignId('company_id')->constrained();
+            $table->foreignId('business_id')->constrained();
             $table->foreignId('created_by')->constrained('users');
             $table->string('po_number')->nullable();
             $table->date('delivery_date');

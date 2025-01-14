@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies', function (Blueprint $table) {
+        Schema::create('businesses', function (Blueprint $table) {
+
+
+
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             // Basic Information
             $table->string('name');
             $table->string('name_arabic')->nullable();
             $table->string('email')->nullable();
+            $table->string('ibr')->nullable();
 
             // Registration Numbers
             $table->string('cr_number', 50)->nullable();              // 1010803499
@@ -69,7 +73,6 @@ return new class extends Migration
 
             // System Fields
             $table->softDeletes();
-            $table->timestamps();
         });
     }
 
@@ -78,6 +81,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies');
+        Schema::dropIfExists('businesses');
     }
 };

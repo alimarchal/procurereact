@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('quotations', function (Blueprint $table) {
             $table->id();
             $table->string('quotation_number')->unique();
-            $table->foreignId('company_id')->constrained();
+            $table->foreignId('business_id')->constrained();
             $table->foreignId('created_by')->constrained('users');
             $table->date('quotation_date');
             $table->date('valid_until');

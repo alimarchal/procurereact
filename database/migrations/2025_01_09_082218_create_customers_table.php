@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('company_id')->constrained()->onDelete('cascade');
+            $table->foreignId('business_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('vat_no')->nullable();
             $table->string('contact')->nullable();
