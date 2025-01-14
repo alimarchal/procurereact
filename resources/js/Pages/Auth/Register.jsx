@@ -1,24 +1,24 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { Head, Link, useForm } from "@inertiajs/react";
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        ibr_no: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
+        name: "",
+        email: "",
+        ibr_no: "",
+        password: "",
+        password_confirmation: "",
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+        post(route("register"), {
+            onFinish: () => reset("password", "password_confirmation"),
         });
     };
 
@@ -26,110 +26,107 @@ export default function Register() {
         <GuestLayout>
             <Head title="Register" />
 
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className="space-y-4">
                 <div>
-                    <InputLabel htmlFor="ibr_no" value="Referral IBR number (If any)"/>
-
+                    <InputLabel
+                        htmlFor="ibr_no"
+                        value="Reference No."
+                        required={false}
+                    />
                     <TextInput
                         id="ibr_no"
                         name="ibr_no"
                         value={data.ibr_no}
+                        placeholder="Enter Reference No, If any"
                         className="mt-1 block w-full"
-                        autoComplete="ibr_no"
-                        isFocused={true}
-                        onChange={(e) => setData('ibr_no', e.target.value)}
-                        required
+                        autoComplete="off"
+                        onChange={(e) => setData("refNo", e.target.value)}
+                        aria-label="Reference Number"
                     />
-
-                    <InputError message={errors.ibr_no} className="mt-2"/>
                 </div>
-
                 <div>
-                    <InputLabel htmlFor="name" value="Name" className="mt-2"/>
-
+                    <InputLabel htmlFor="name" value="Name" required={true} />
                     <TextInput
                         id="name"
                         name="name"
                         value={data.name}
+                        placeholder="Enter Full Name"
                         className="mt-1 block w-full"
                         autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
+                        onChange={(e) =>
+                            setData({ ...data, name: e.target.value })
+                        }
+                        aria-label="Full name"
                     />
-
-                    <InputError message={errors.name} className="mt-2"/>
+                    <InputError message={errors.name} className="mt-2" />
                 </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email"/>
-
+                <div>
+                    <InputLabel htmlFor="email" value="Email" required={true} />
                     <TextInput
                         id="email"
                         type="email"
                         name="email"
                         value={data.email}
+                        placeholder="Enter Email"
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
+                        onChange={(e) => setData("email", e.target.value)}
+                        aria-label="Email address"
                     />
-
-                    <InputError message={errors.email} className="mt-2"/>
+                    <InputError message={errors.email} className="mt-2" />
                 </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password"/>
-
+                <div>
+                    <InputLabel
+                        htmlFor="password"
+                        value="Password"
+                        required={true}
+                    />
                     <TextInput
                         id="password"
                         type="password"
                         name="password"
                         value={data.password}
+                        placeholder="Enter Password"
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
+                        onChange={(e) => setData("password", e.target.value)}
+                        aria-label="Password"
                     />
-
-                    <InputError message={errors.password} className="mt-2"/>
+                    <InputError message={errors.password} className="mt-2" />
                 </div>
-
-                <div className="mt-4">
+                <div>
                     <InputLabel
                         htmlFor="password_confirmation"
                         value="Confirm Password"
+                        required={true}
                     />
-
                     <TextInput
                         id="password_confirmation"
                         type="password"
                         name="password_confirmation"
                         value={data.password_confirmation}
+                        placeholder="Enter Confirm Password"
                         className="mt-1 block w-full"
                         autoComplete="new-password"
                         onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
+                            setData("password_confirmation", e.target.value)
                         }
-                        required
+                        aria-label="Confirm password"
                     />
-
                     <InputError
                         message={errors.password_confirmation}
                         className="mt-2"
                     />
                 </div>
-
-                <div className="mt-4 flex items-center justify-end">
+                <div className="flex items-center justify-between space-y-4">
                     <Link
-                        href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        href={route("login")}
+                        className="text-sm text-gray-600 underline hover:text-gray-900"
                     >
                         Already registered?
                     </Link>
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
+                    <PrimaryButton className="ml-4" disabled={processing}>
+                        {processing ? "Processing..." : "Register"}
                     </PrimaryButton>
                 </div>
             </form>
