@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\V1\BusinessController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\CompanyController;
 use App\Http\Controllers\Api\V1\CustomerController;
 use App\Http\Controllers\Api\V1\ItemController;
 use App\Http\Controllers\Api\V1\ProjectController;
-use App\Http\Controllers\BusinessController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
@@ -23,7 +23,10 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
-        Route::apiResource('business', BusinessController::class);
+        Route::apiResource('businesses', BusinessController::class);
+        Route::patch('businesses/{id}/restore', [BusinessController::class, 'restore']);
+        Route::delete('businesses/{id}/force', [BusinessController::class, 'forceDelete']);
+
         Route::apiResource('customers', CustomerController::class);
         Route::apiResource('projects', ProjectController::class);
         Route::apiResource('categories', CategoryController::class);

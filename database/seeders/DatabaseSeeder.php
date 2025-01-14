@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call([
             PermissionsDemoSeeder::class,
+            BusinessSeeder::class,
         ]);
     }
 }
