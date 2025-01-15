@@ -3,74 +3,57 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
+use App\Http\Resources\V1\BusinessResource;
 use App\Http\Resources\V1\ProjectResource;
 use App\Models\Project;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProjectController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index()
     {
         $projects = Project::query()
             ->where('user_id', auth()->id())
             ->with('customer')
             ->latest()
-            ->paginate();
+            ->paginate(config('pagination.per_page', 15));
 
         return ProjectResource::collection($projects);
     }
 
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'boolean'
-        ]);
-
         $project = Project::create([
-            ...$validated,
+            ...$request->validated(),
             'user_id' => auth()->id()
         ]);
 
-        return new ProjectResource($project);
+        return (new ProjectResource($project))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
-    public function show(Project $project)
+    public function show(Project $project): JsonResponse
     {
-        if ($project->user_id !== auth()->id()) {
-            abort(403);
-        }
-        return new ProjectResource($project);
+        return (new ProjectResource($project))->response()->setStatusCode(Response::HTTP_OK);
     }
 
-    public function update(Request $request, Project $project)
+    public function update(UpdateProjectRequest $request, Project $project): JsonResponse
     {
-        if ($project->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $project->update($request->validated());
 
-        $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'boolean'
-        ]);
-
-        $project->update($validated);
-
-        return new ProjectResource($project);
+        return (new ProjectResource($project->fresh()))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 
-    public function destroy(Project $project)
+    public function destroy(Project $project): JsonResponse
     {
-        if ($project->user_id !== auth()->id()) {
-            abort(403);
-        }
-
         $project->delete();
-        return response()->noContent();
+
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }

@@ -45,21 +45,31 @@ class BusinessController extends Controller
 
     public function store(StoreBusinessRequest $request)
     {
-        $validated = $request->validated();
+        try {
+            $validated = $request->validated();
 
-        if ($request->hasFile('company_logo')) {
-            $validated['company_logo'] = $request->file('company_logo')
-                ->store('business/logos', 'public');
+            if ($request->hasFile('company_logo')) {
+                $validated['company_logo'] = $request->file('company_logo')
+                    ->store('business/logos', 'public');
+            }
+
+            if ($request->hasFile('company_stamp')) {
+                $validated['company_stamp'] = $request->file('company_stamp')
+                    ->store('business/stamps', 'public');
+            }
+
+            $business = Business::create($validated);
+
+            return (new BusinessResource($business))
+                ->response()
+                ->setStatusCode(201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to create business',
+                'errors' => [$e->getMessage()]
+            ], 500);
         }
-
-        if ($request->hasFile('company_stamp')) {
-            $validated['company_stamp'] = $request->file('company_stamp')
-                ->store('business/stamps', 'public');
-        }
-
-        $business = Business::create($validated);
-
-        return new BusinessResource($business);
     }
 
     public function show(Business $business)

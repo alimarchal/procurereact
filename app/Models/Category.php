@@ -12,15 +12,15 @@ class Category extends Model
 
     protected $fillable = [
         'user_id',
-        'company_id',
+        'business_id',
         'name',
         'description',
         'status'
     ];
 
-    public function company()
+    public function business(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Business::class);
     }
 
     public function user()

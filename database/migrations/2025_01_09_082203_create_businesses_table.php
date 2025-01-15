@@ -16,11 +16,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('parent_id')->nullable()->constrained('businesses')->onDelete('set null');
+            $table->string('ibr')->nullable();
             // Basic Information
             $table->string('name');
             $table->string('name_arabic')->nullable();
             $table->string('email')->nullable();
-            $table->string('ibr')->nullable();
+
             // Registration Numbers
             $table->string('cr_number', 50)->nullable();
             $table->string('vat_number', 50)->nullable();

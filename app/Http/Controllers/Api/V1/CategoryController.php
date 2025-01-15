@@ -12,12 +12,12 @@ class CategoryController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
-        if (!auth()->user()->company) {
-            abort(403, 'No company associated with user');
+        if (!auth()->user()->business) {
+            abort(403, 'No business associated with user');
         }
 
         $categories = Category::query()
-            ->where('company_id', auth()->user()->company->id)
+            ->where('business_id', auth()->user()->business->id)
             ->latest()
             ->paginate();
 
@@ -27,6 +27,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'business_id' => ['required', 'exists:businesses,id'],
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'status' => 'boolean'
@@ -35,7 +36,6 @@ class CategoryController extends Controller
         $category = Category::create([
             ...$validated,
             'user_id' => auth()->id(),
-            'company_id' => auth()->user()->company->id
         ]);
 
         return new CategoryResource($category);
@@ -43,19 +43,42 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        if ($category->company_id !== auth()->user()->company->id) {
-            abort(403);
-        }
         return new CategoryResource($category);
+//        try {
+//            $user = auth()->user();
+//
+//            if (!$user || !$user->business) {
+//                return response()->json([
+//                    'message' => 'User or business not found',
+//                    'status' => 403
+//                ], 403);
+//            }
+//
+//            if ($category->business_id !== $user->business->id) {
+//                return response()->json([
+//                    'message' => 'Unauthorized access',
+//                    'status' => 403
+//                ], 403);
+//            }
+//
+//
+//
+//        } catch (\Exception $e) {
+//            return response()->json([
+//                'message' => $e->getMessage(),
+//                'status' => 500
+//            ], 500);
+//        }
     }
 
     public function update(Request $request, Category $category)
     {
-        if ($category->company_id !== auth()->user()->company->id) {
+        if ($category->business_id !== auth()->user()->business->id) {
             abort(403);
         }
 
         $validated = $request->validate([
+            'business_id' => ['required', 'exists:businesses,id'],
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'status' => 'boolean'
@@ -68,7 +91,7 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        if ($category->company_id !== auth()->user()->company->id) {
+        if ($category->business_id !== auth()->user()->business->id) {
             abort(403);
         }
 
