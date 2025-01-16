@@ -25,7 +25,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'type' => 'required|string|in:Super Admin,Admin Support,Admin,Team Member,IBR',
-            'parent_id' => 'required|string|max:255',
+            'parent_id' => 'nullable|string|max:255',
         ]);
 
         try {

@@ -10,6 +10,7 @@ use App\Models\Business;
 use App\Services\CommissionCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class BusinessController extends Controller
 {
@@ -76,12 +77,17 @@ class BusinessController extends Controller
             $calculator->processCommission($business);
 
 
-
             return (new BusinessResource($business))
                 ->response()
                 ->setStatusCode(201);
 
         } catch (\Exception $e) {
+
+            Log::error('Business registration failed', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage()
+            ]);
+
             return response()->json([
                 'message' => 'Failed to create business',
                 'errors' => [$e->getMessage()]
