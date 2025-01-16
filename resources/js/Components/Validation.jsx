@@ -91,5 +91,9 @@ export const validateForm = (formData) => {
         errors.apply_discount_type = "Discount Type is required";
     if (!formData.language) errors.language = "Language is required";
 
+    // Additional validation
+    if (!formData.company_type)
+        errors.company_type = "Company Type is required";
+    
     return errors;
 };
