@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use App\Http\Resources\V1\UserResource;
 use App\Models\User;
@@ -24,7 +25,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'type' => 'required|string|in:Super Admin,Admin Support,Admin,Team Member,IBR',
-            'ibr_no' => 'nullable|string|max:255',
+            'parent_id' => 'required|string|max:255',
         ]);
 
         try {
@@ -32,11 +33,28 @@ class AuthController extends Controller
             return DB::transaction(function() use ($validated, $request) {
                 // Create new user with validated data
                 $user = User::create([
+                    'parent_id' => $validated['parent_id'] ?? null,
                     'name' => $validated['name'],
                     'email' => $validated['email'],
                     'password' => Hash::make($validated['password']),
-                    'ibr_no' => $validated['ibr_no'] ?? null, // Add IBR number if provided
+                    'type' => $validated['type'] ?? 'Admin',
+                    'is_active' => 'Yes',
+                    'is_super_admin' => 'No',
+                    'gender' => $validated['gender'] ?? null,
+                    'country_of_business' => $validated['country_of_business'] ?? null,
+                    'city_of_business' => $validated['city_of_business'] ?? null,
+                    'country_of_bank' => $validated['country_of_bank'] ?? null,
+                    'bank' => $validated['bank'] ?? null,
+                    'iban' => $validated['iban'] ?? null,
+                    'currency' => $validated['currency'] ?? null,
+                    'mobile_number' => $validated['mobile_number'] ?? null,
+                    'dob' => $validated['dob'] ?? null,
+                    'mac_address' => $validated['mac_address'] ?? null,
+                    'device_name' => $validated['device_name'] ?? null,
                 ]);
+
+                // Create wallet for new user
+                Wallet::create(['user_id' => $user->id]);
 
                 // Assign role based on type (defaults to Admin)
                 $role = Role::findByName($request->type ?? 'Admin');
@@ -81,6 +99,9 @@ class AuthController extends Controller
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
+
+        // Revoke all previous tokens for the user
+        $user->tokens()->delete();
 
         $token = $user->createToken('auth_token')->plainTextToken;
         // Get user role and permissions

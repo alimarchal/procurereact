@@ -12,56 +12,47 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('businesses', function (Blueprint $table) {
-
+            // Primary key
             $table->id();
+
+            // Foreign key referencing the users table
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('parent_id')->nullable()->constrained('businesses')->onDelete('set null');
-            $table->string('ibr')->nullable();
-            // Basic Information
+
+            // Business transaction amount
+            $table->decimal('amount', 10, 2)->default(0);
+            $table->string('reference_number')->unique()->nullable();
+
+            // Basic business information
             $table->string('name');
             $table->string('name_arabic')->nullable();
             $table->string('email')->nullable();
 
-            // Registration Numbers
+            // Registration numbers
             $table->string('cr_number', 50)->nullable();
             $table->string('vat_number', 50)->nullable();
             $table->string('vat_number_arabic')->nullable();
-            // Contact Information
+
+            // Contact information
             $table->string('cell', 20)->nullable();
             $table->string('mobile', 20)->nullable();
             $table->string('phone', 20)->nullable();
-            // Location Information
+
+            // Location information
             $table->string('address')->nullable();
             $table->string('city')->nullable();
             $table->string('country')->nullable();
-            // Business Details
+
+            // Business details
             $table->string('customer_industry')->nullable();
             $table->string('sale_type')->nullable();
             $table->string('article_no')->nullable();
-            $table->string('business_type_english')->nullable();
-            $table->string('business_type_arabic')->nullable();
-            $table->text('business_description_english')->nullable();
-            $table->text('business_description_arabic')->nullable();
-            // Invoice Settings
-            $table->string('invoice_side_arabic')->nullable();
-            $table->string('invoice_side_english')->nullable();
-            $table->string('english_description')->nullable();
-            $table->string('arabic_description')->nullable();
+
+            // Invoice settings
             $table->decimal('vat_percentage', 5, 2)->nullable();
-            $table->string('apply_discount_type')->nullable();
-            $table->string('language')->nullable();
+            $table->string('company_type')->default();
             $table->boolean('show_email_on_invoice')->default(false);
-            // Website Information
-            $table->string('website')->nullable();
-            // Banking Information
-            $table->string('bank_name')->nullable();
-            $table->string('iban', 50)->nullable();
-            // Type Information
-            $table->string('company_type')->default('customer');
-            // New Fields for File Uploads
-            $table->string('company_logo')->nullable();
-            $table->string('company_stamp')->nullable();
-            // System Fields
+
+            // System fields
             $table->softDeletes();
             $table->timestamps();
         });

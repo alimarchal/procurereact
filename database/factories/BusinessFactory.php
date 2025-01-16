@@ -16,15 +16,17 @@ class BusinessFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
+            'user_id' => 1,
             'name' => $this->faker->company(),
-            'email' => $this->faker->companyEmail(),
+            'email' => $this->faker->email(),
             'phone' => $this->faker->phoneNumber(),
             'address' => $this->faker->address(),
             'city' => $this->faker->city(),
             'country' => $this->faker->country(),
+            'amount' => $this->faker->randomFloat(2, 100, 10000),
             'vat_percentage' => $this->faker->randomFloat(2, 0, 20),
             'company_type' => 'customer',
+            'reference_number' => \Str::uuid(),
         ];
     }
 }

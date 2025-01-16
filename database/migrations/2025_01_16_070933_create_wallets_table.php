@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ibr_indirect_commissions', function (Blueprint $table) {
+        Schema::create('wallets', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->decimal('balance', 10, 2)->default(0);
+            $table->decimal('total_earned', 10, 2)->default(0); // Total lifetime earnings
+            $table->decimal('total_withdrawn', 10, 2)->default(0);
             $table->timestamps();
         });
     }
@@ -22,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ibr_indirect_commissions');
+        Schema::dropIfExists('wallets');
     }
 };

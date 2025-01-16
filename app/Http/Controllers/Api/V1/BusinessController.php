@@ -7,6 +7,7 @@ use App\Http\Requests\StoreBusinessRequest;
 use App\Http\Requests\UpdateBusinessRequest;
 use App\Http\Resources\V1\BusinessResource;
 use App\Models\Business;
+use App\Services\CommissionCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -48,6 +49,9 @@ class BusinessController extends Controller
         try {
             $validated = $request->validated();
 
+            // Add the authenticated user's ID
+            $validated['user_id'] = auth()->id();
+
             if ($request->hasFile('company_logo')) {
                 $validated['company_logo'] = $request->file('company_logo')
                     ->store('business/logos', 'public');
@@ -58,7 +62,20 @@ class BusinessController extends Controller
                     ->store('business/stamps', 'public');
             }
 
+            $user = auth()->user();
+
+            // Ensure the user has a wallet
+            if (!$user->wallet) {
+                $user->wallet()->create();
+            }
+
             $business = Business::create($validated);
+
+
+            $calculator = app(CommissionCalculator::class);
+            $calculator->processCommission($business);
+
+
 
             return (new BusinessResource($business))
                 ->response()

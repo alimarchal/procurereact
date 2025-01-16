@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Wallet;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
@@ -28,7 +29,13 @@ class PermissionsDemoSeeder extends Seeder
             'name' => 'Super-Admin User',
             'email' => 'superadmin@example.com',
             'password' => Hash::make('password'),
+            'is_super_admin' =>'Yes',
+            'is_active' =>'Yes',
+            'type' =>'Super Admin',
         ]);
+
+        // Create wallet for new user
+        Wallet::create(['user_id' => $user->id]);
 
         // php artisan migrate:fresh --seed --seeder=PermissionsDemoSeeder
         $user->assignRole($role1);

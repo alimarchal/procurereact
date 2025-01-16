@@ -13,10 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('ibr_no')->nullable()->unique();
-            $table->foreignId('referred_by')->nullable()
-                ->constrained('users', 'id')
-                ->onDelete('set null');
+            $table->foreignId('parent_id')->nullable()->constrained('users', 'id')->onDelete('set null');
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
@@ -34,7 +31,7 @@ return new class extends Migration
             $table->string('mac_address')->nullable();
             $table->string('device_name')->nullable();
             $table->enum('type',['Super Admin','Admin Support','Admin','Team Member','IBR'])->default('Admin');
-            $table->enum('is_active',['Yes','No'])->nullable();
+            $table->enum('is_active',['Yes','No'])->default('Yes');
             $table->enum('is_super_admin',['Yes','No'])->default('No')->nullable();
             $table->timestamps();
         });
