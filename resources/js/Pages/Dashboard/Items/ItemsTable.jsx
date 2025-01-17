@@ -1,10 +1,10 @@
 import React from "react";
 
-const CategoriesTable = ({ categories }) => {
+const ItemsTable = ({ items }) => {
     return (
         <div className="bg-white shadow rounded-lg p-4">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">Categories</h2>
+                <h2 className="text-lg font-semibold">Items</h2>
                 <button className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">
                     Add New
                 </button>
@@ -12,23 +12,27 @@ const CategoriesTable = ({ categories }) => {
             <table className="w-full border-collapse">
                 <thead>
                     <tr className="bg-gray-100">
+                        <th className="border p-2 text-left">Code</th>
                         <th className="border p-2 text-left">Name</th>
-                        <th className="border p-2 text-left">Description</th>
+                        <th className="border p-2 text-left">Category</th>
+                        <th className="border p-2 text-left">Unit</th>
+                        <th className="border p-2 text-left">Stock</th>
+                        <th className="border p-2 text-left">Unit Price</th>
                         <th className="border p-2 text-left">Status</th>
                         <th className="border p-2 text-left">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {categories.length > 0 ? (
-                        categories.map((category) => (
-                            <tr key={category.id}>
-                                <td className="border p-2">{category.name}</td>
-                                <td className="border p-2">
-                                    {category.description}
-                                </td>
-                                <td className="border p-2">
-                                    {category.status}
-                                </td>
+                    {items.length > 0 ? (
+                        items.map((item) => (
+                            <tr key={item.id} className="hover:bg-gray-50">
+                                <td className="border p-2">{item.code}</td>
+                                <td className="border p-2">{item.name}</td>
+                                <td className="border p-2">{item.category}</td>
+                                <td className="border p-2">{item.unit}</td>
+                                <td className="border p-2">{item.stock}</td>
+                                <td className="border p-2">{item.unitPrice}</td>
+                                <td className="border p-2">{item.status}</td>
                                 <td className="border p-2">
                                     <button className="text-blue-500 hover:underline mr-2">
                                         Edit
@@ -68,4 +72,4 @@ const CategoriesTable = ({ categories }) => {
     );
 };
 
-export default CategoriesTable;
+export default ItemsTable;

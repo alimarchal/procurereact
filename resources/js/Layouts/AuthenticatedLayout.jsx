@@ -1,167 +1,143 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import React, { useState } from "react";
+import { FaBell, FaSearch, FaAngleDown } from "react-icons/fa";
+import { usePage } from "@inertiajs/react";
+import ResponsiveNavLink from "../Components/ResponsiveNavLink";
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between">
-                        <div className="flex">
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
-
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
+            <nav className="p-6 shadow border-b border-gray-200 bg-white">
+                <div className="flex flex-wrap justify-between items-center gap-y-4">
+                    {/* Logo and Search Bar */}
+                    <div className="flex items-center gap-10">
+                        <span className="text-2xl font-bold">Architect</span>
+                        <div className="relative">
+                            {searchOpen ? (
+                                <div className="flex items-center border rounded-full bg-gray-100 px-4">
+                                    <input
+                                        type="text"
+                                        placeholder="Type to search"
+                                        className="bg-transparent focus:outline-none border-none"
+                                    />
+                                    <FaSearch className="text-gray-500 ml-2" />
+                                    <button
+                                        onClick={() => setSearchOpen(false)}
+                                        className="ml-2 text-gray-500"
+                                    >
+                                        X
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setSearchOpen(true)}
+                                    className="p-2 bg-gray-200 rounded-full text-blue-500"
                                 >
-                                    Dashboard
-                                </NavLink>
+                                    <FaSearch />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Notification, Flag, Vertical Line, Profile */}
+                    <div className="flex items-center gap-4">
+                        {/* Notification Icon */}
+                        <button className="relative p-2 bg-red-200 rounded-full">
+                            <FaBell className="text-red-500" />
+                            <span className="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full"></span>
+                        </button>
+
+                        {/* Flag */}
+                        <div className="flex items-center gap-4">
+                            <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200">
+                                <img
+                                    src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg"
+                                    alt="USA Flag"
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
+                            {/* Vertical Line */}
+                            <div className="border-l h-6 border-gray-300"></div>
                         </div>
 
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {user.name}
-
-                                                <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
-
-                                    <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
-                                            Profile
-                                        </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route('logout')}
-                                            method="post"
-                                            as="button"
-                                        >
-                                            Log Out
-                                        </Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <div className="-me-2 flex items-center sm:hidden">
+                        {/* Profile and Dropdown */}
+                        <div className="relative">
                             <button
-                                onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState,
-                                    )
-                                }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
+                                onClick={() => setDropdownOpen(!dropdownOpen)}
+                                className="flex items-center space-x-2"
                             >
-                                <svg
-                                    className="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
+                                <div className="w-8 h-8 bg-blue-200 text-blue-700 font-bold rounded-full flex items-center justify-center">
+                                    A
+                                </div>
+                                <FaAngleDown className="text-gray-500" />
+                                <div className="text-left hidden sm:block text-sm">
+                                    <span className="block font-semibold">
+                                        {user.name}
+                                    </span>
+                                    <span className="block text-gray-500 text-xs">
+                                        VP People Manager
+                                    </span>
+                                </div>
                             </button>
-                        </div>
-                    </div>
-                </div>
 
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
-                    }
-                >
-                    <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
-                            </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
-                            </div>
-                        </div>
-
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
+                            {dropdownOpen && (
+                                <div className="absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-lg">
+                                    <div className="flex items-center space-x-4 bg-blue-50 p-4 border-b">
+                                        <div className="w-10 h-10 bg-blue-200 text-blue-700 font-bold rounded-full flex items-center justify-center">
+                                            A
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold">
+                                                {user?.name}
+                                            </p>
+                                            <p className="text-gray-500 text-xs">
+                                                A short profile description
+                                            </p>
+                                            <p className="text-gray-500 text-xs">
+                                                {user?.email}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 px-4">
+                                        <p className="text-gray-700 text-sm font-semibold mb-2">
+                                            MY ACCOUNT
+                                        </p>
+                                        <ul className="space-y-2">
+                                            <li>
+                                                <a
+                                                    href="/profile"
+                                                    className="text-blue-600 hover:underline"
+                                                >
+                                                    Profile
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a
+                                                    href=""
+                                                    className="text-blue-600 hover:underline"
+                                                >
+                                                    Logs
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <ResponsiveNavLink
+                                        method="post"
+                                        href={route("logout")}
+                                        className=""
+                                    >
+                                        Logout
+                                    </ResponsiveNavLink>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </nav>
-
             {header && (
                 <header className="bg-white shadow">
                     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -169,7 +145,6 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 </header>
             )}
-
             <main>{children}</main>
         </div>
     );

@@ -1,5 +1,7 @@
 import React from "react";
 import Category from "./Categories/Category";
+import Items from "./Items/Items";
+import Customers from "./Customers/Customers";
 
 const Content = ({ currentPage }) => {
     return (
@@ -20,12 +22,10 @@ const Content = ({ currentPage }) => {
 
             {currentPage === "Categories" && <Category />}
 
-            {currentPage === "Items" && (
-                <p>View and edit your inventory items.</p>
-            )}
-            {currentPage === "Customers" && (
-                <p>See your customer list and manage profiles.</p>
-            )}
+            {currentPage === "Items" && <Items />}
+
+            {currentPage === "Customers" && <Customers />}
+
             {currentPage === "Pages" && <p>Manage website pages here.</p>}
             {currentPage === "Applications" && (
                 <p>Access various applications integrated with the system.</p>
