@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
-import SelectInput from "@/Components/SelectInput";
+import axios from "axios";
 
 const AddCategoryForm = ({ onCategoryAdded }) => {
     const [formData, setFormData] = useState({
@@ -33,28 +33,30 @@ const AddCategoryForm = ({ onCategoryAdded }) => {
             return;
         }
 
-        // try {
-        //     const response = await fetch("/api/categories", {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         },
-        //         body: JSON.stringify(formData),
-        //     });
+        try {
+            const token = localStorage.getItem("authToken");
 
-        //     if (!response.ok) {
-        //         throw new Error("Failed to save category.");
-        //     }
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+            };
 
-        //     const savedCategory = await response.json();
-        //     onCategoryAdded(savedCategory);
+            const response = await axios.post(
+                "/api/categories",
+                formData,
+                config
+            );
 
-        //     setFormData({ name: "", status: "", description: "" });
-        //     setErrors({});
-        // } catch (error) {
-        //     console.error(error);
-        //     alert("An error occurred while saving the category.");
-        // }
+            setFormData({ name: "", status: "", description: "" });
+            setErrors({});
+            onCategoryAdded(response.data);
+        } catch (error) {
+            setErrors(error.response?.data?.errors || {});
+            console.error("Error saving category:", error);
+        }
     };
 
     return (
@@ -82,23 +84,17 @@ const AddCategoryForm = ({ onCategoryAdded }) => {
                     </div>
                     <div>
                         <InputLabel htmlFor="status" value="Status" />
-                        <SelectInput
+                        <select
                             id="status"
                             name="status"
                             value={formData.status}
                             onChange={handleInputChange}
                             placeholder="Status"
-                            options={[
-                                {
-                                    value: "active",
-                                    label: "Active",
-                                },
-                                {
-                                    value: "inactive",
-                                    label: "Inactive",
-                                },
-                            ]}
-                        />
+                            className="mt-1 block w-full p-3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        >
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
                     </div>
                 </div>
                 <div className="mb-4">
@@ -115,7 +111,7 @@ const AddCategoryForm = ({ onCategoryAdded }) => {
                 </div>
                 <button
                     type="submit"
-                    className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                    className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 w-full"
                 >
                     Save Category
                 </button>
