@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\CustomerController;
 use App\Http\Controllers\Api\V1\IbrController;
 use App\Http\Controllers\Api\V1\ItemController;
 use App\Http\Controllers\Api\V1\ProjectController;
+use App\Http\Controllers\Api\V1\WalletController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
@@ -35,43 +36,16 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('items', ItemController::class);
 
 
-//
-//
-//        // IBR
-//        Route::get('business-referrals', [IbrController::class, 'business_referrals']);
-//
-//        Route::get('ibr-referrals', [IbrController::class, 'ibr_referrals']);
-//
-//
-//
-//
-//        /* Profile Update Routes */
-//        Route::post('profile/update/', [IbrController::class, 'profileUpdate']);
-//        /* Profile Update Routes */
-//
-//        /* Direct Commission Routes */
-//        Route::get('direct-commissions', [IbrController::class, 'directCommissions']);
-//        /* Direct Commission Routes */
-//
-//        /* Indirect Commission Routes */
-//        Route::get('indirect-commissions', [IbrController::class, 'inDirectCommissions']);
-//        /* Indirect Commission Routes */
-//
-//        /* Dashboard related routes start */
-//
-//        /* My earnings Route */
-//        Route::get('earnings', [IbrController::class, 'myEarnings']);
-//        /* My earnings Route */
-//
-//        /* My clients Route */
-//        Route::get('clients', [IbrController::class, 'myClients']);
-//        /* My clients Route */
-//
-//        /* My network Route */
-//        Route::get('network', [IbrController::class, 'myNetworks']);
-//        /* My network Route */
-//
+        Route::apiResource('wallets', WalletController::class);
 
+        // Commission and Network Routes
+        Route::controller(WalletController::class)->group(function () {
+            Route::get('direct-commissions', 'directCommissions');
+            Route::get('indirect-commissions', 'indirectCommissions');
+            Route::get('earnings', 'myEarnings');
+            Route::get('clients', 'myClients');
+            Route::get('network', 'myNetworks');
+        });
 
     });
 });
