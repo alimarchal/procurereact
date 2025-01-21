@@ -26,6 +26,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::apiResource('businesses', BusinessController::class);
+        Route::get('businesses/{id}/user/{user_id}', [BusinessController::class, 'getUserBusiness']);
         Route::patch('businesses/{id}/restore', [BusinessController::class, 'restore']);
         Route::delete('businesses/{id}/force', [BusinessController::class, 'forceDelete']);
         Route::apiResource('customers', CustomerController::class);

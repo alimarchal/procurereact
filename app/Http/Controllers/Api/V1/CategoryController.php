@@ -3,42 +3,78 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\BusinessResource;
 use App\Http\Resources\V1\CategoryResource;
+use App\Models\Business;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\ValidationException;
 
 class CategoryController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(): \Illuminate\Http\JsonResponse
     {
-        if (!auth()->user()->business) {
-            abort(403, 'No business associated with user');
+
+        try {
+            $categories = Category::query()
+                ->where('user_id', auth()->user()->id)
+                ->latest()
+                ->paginate();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => CategoryResource::collection($categories),
+                'meta' => [
+                    'total' => $categories->total(),
+                    'current_page' => $categories->currentPage(),
+                    'last_page' => $categories->lastPage(),
+                    'per_page' => $categories->perPage()
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch customers',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $categories = Category::query()
-            ->where('business_id', auth()->user()->business->id)
-            ->latest()
-            ->paginate();
-
-        return CategoryResource::collection($categories);
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'business_id' => ['required', 'exists:businesses,id'],
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'boolean'
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'status' => 'boolean'
+            ]);
 
-        $category = Category::create([
-            ...$validated,
-            'user_id' => auth()->id(),
-        ]);
+            $category = Category::create([
+                ...$validated,
+                'user_id' => auth()->id(),
+                'business_id' => auth()->user()->business->id,
+            ]);
 
-        return new CategoryResource($category);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Category created successfully',
+                'data' => new CategoryResource($category)
+            ], 201);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to create category',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show(Category $category)

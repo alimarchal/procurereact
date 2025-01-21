@@ -16,33 +16,30 @@ class BusinessController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Business::query();
+        try {
+            $business = Business::query()
+                ->where('user_id', auth()->user()->id)
+                ->latest()
+                ->paginate();
 
-        // Search by name
-        if ($request->has('search')) {
-            $query->where('name', 'like', "%{$request->search}%")
-                ->orWhere('name_arabic', 'like', "%{$request->search}%");
+            return response()->json([
+                'status' => 'success',
+                'data' => BusinessResource::collection($business),
+                'meta' => [
+                    'total' => $business->total(),
+                    'current_page' => $business->currentPage(),
+                    'last_page' => $business->lastPage(),
+                    'per_page' => $business->perPage()
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch customers',
+                'error' => $e->getMessage()
+            ], 500);
         }
 
-        // Filter by company type
-        if ($request->has('company_type')) {
-            $query->where('company_type', $request->company_type);
-        }
-
-        // Filter by city
-        if ($request->has('city')) {
-            $query->where('city', $request->city);
-        }
-
-        // Order by
-        $orderBy = $request->order_by ?? 'created_at';
-        $direction = $request->direction ?? 'desc';
-        $query->orderBy($orderBy, $direction);
-
-        // Pagination
-        $perPage = $request->per_page ?? 15;
-
-        return BusinessResource::collection($query->paginate($perPage));
     }
 
     public function store(StoreBusinessRequest $request)
@@ -97,7 +94,26 @@ class BusinessController extends Controller
 
     public function show(Business $business)
     {
-        return new BusinessResource($business->load(['user', 'parent', 'children']));
+        try {
+            if ($business->id !== auth()->user()->business->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access'
+                ], 403);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => new BusinessResource($business->load(['user']))
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch business',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function update(UpdateBusinessRequest $request, Business $business)
