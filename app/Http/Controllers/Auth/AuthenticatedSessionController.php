@@ -33,6 +33,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Retrieve the authenticated user
+        $user = Auth::user();
+        // Delete any existing tokens for the user to ensure a single active token
+        $user->tokens()->delete();
+        // Create a new Sanctum token for the user
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
